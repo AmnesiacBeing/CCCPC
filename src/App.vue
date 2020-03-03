@@ -1,29 +1,68 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+  <v-app>
+    <div id="appbar-drag-region"></div>
+    <v-app-bar app color="primary" dark>
+      <v-btn icon title="返回">
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
+      <v-toolbar-title>{{ tipTitle }}</v-toolbar-title>
+      <v-spacer />
+      <v-btn icon title="置顶窗口">
+        <v-icon>{{lock?'mdi-lock':'mdi-lock-open'}}</v-icon>
+      </v-btn>
+      <v-btn icon title="自适应窗口">
+        <v-icon>mdi-refresh</v-icon>
+      </v-btn>
+      <v-btn icon title="关闭窗口">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-app-bar>
+    <v-content>
+      <router-view />
+    </v-content>
+  </v-app>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import HelloWorld from './components/HelloWorld.vue'
+import Vue from 'vue'
 
-@Component({
-  components: {
-    HelloWorld
-  }
+export default Vue.extend({
+  name: 'App',
+
+  components: {},
+
+  data: () => ({
+    tipTitle: 'CCC',
+    lock: false
+  })
 })
-export default class App extends Vue {}
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html {
+  overflow: hidden !important;
+}
+
+#appbar-drag-region {
+  position: fixed;
+  left: 48px;
+  top: 2px;
+  right: 144px;
+  height: 48px;
+  -webkit-app-region: drag;
+}
+
+.titleBar {
+  height: 40px;
+  padding: 0 0;
+  background: #409eff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tipTitle {
+  flex: 1;
+  color: white;
 }
 </style>
