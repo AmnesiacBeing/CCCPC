@@ -1,54 +1,65 @@
 <template>
-  <v-card>
+  <v-card style="margin:10px 20px;">
     <v-list subheader two-line>
       <v-subheader>
-        {{ tipTitle }}
+        {{ this.$store.state.devices.length==0?'无':'' }}配对设备
         <v-spacer />
-        <v-btn icon title="连接新设备">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+        <v-menu>
+          <template v-slot:activator="{ on: menu }">
+            <v-btn outlined title="连接新设备" v-on="menu">
+              添加
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item @click="$router.push('qrcode');">
+              <v-list-item-icon>
+                <v-icon>mdi-qrcode</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>显示二维码</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click=";">
+              <v-list-item-icon>
+                <v-icon>mdi-qrcode-scan</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>扫描二维码</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </v-subheader>
-      <v-list-item @click=";" v-if="items.length>=1">
-        <v-list-item-avatar>
-          <v-icon v-text="items[0].type" />
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title v-text="items[0].name">设备名称</v-list-item-title>
-          <v-list-item-subtitle v-text="items[0].status">设备状态</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-btn @click.stop="showRemoveDeviceDialog=true" icon>
-            <v-icon>mdi-information</v-icon>
-          </v-btn>
-        </v-list-item-action>
-      </v-list-item>
-      <v-list-group v-if="items.length>1">
+      <device-info
+        :device="this.$store.state.devices[0]"
+        @click=";"
+        @info="openDialog($event)"
+        v-if="this.$store.state.devices.length>=1"
+      />
+      <v-list-group v-if="this.$store.state.devices.length>1">
         <template v-slot:activator>
           <v-list-item-subtitle>查看更多</v-list-item-subtitle>
         </template>
-        <template v-for="(item,index) in items">
-          <v-list-item :key="item.uuid" @click=";" v-if="index!=0">
-            <v-list-item-avatar>
-              <v-icon v-text="item.type" />
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title v-text="item.name">设备名称</v-list-item-title>
-              <v-list-item-subtitle v-text="item.status">设备状态</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-btn icon>
-                <v-icon>mdi-information</v-icon>
-              </v-btn>
-            </v-list-item-action>
-          </v-list-item>
+        <template v-for="(item,index) in this.$store.state.devices">
+          <device-info
+            :device="item"
+            :key="item.uuid"
+            @click=";"
+            @info="openDialog($event)"
+            v-if="index!=0"
+          />
         </template>
       </v-list-group>
     </v-list>
     <v-divider />
-    <v-subheader>功能</v-subheader>
     <v-list>
+      <v-subheader>
+        功能
+        <v-spacer />
+        <v-btn outlined title="设置">
+          设置
+          <v-icon>mdi-settings</v-icon>
+        </v-btn>
+      </v-subheader>
       <template v-for="func in funcs">
-        <v-list-item :key="func.name" @click="consolo.log(`func click`)">
+        <v-list-item :key="func.name" @click=";">
           <v-list-item-avatar>
             <v-icon v-text="func.icon" />
           </v-list-item-avatar>
@@ -56,7 +67,7 @@
             <v-list-item-title v-text="func.name">功能名称</v-list-item-title>
           </v-list-item-content>
           <v-list-item-action>
-            <v-btn @click="consolo.log(`icon click`);" icon>
+            <v-btn @click=";" icon>
               <v-icon>mdi-settings</v-icon>
             </v-btn>
           </v-list-item-action>
@@ -64,73 +75,43 @@
       </template>
     </v-list>
 
-    <v-dialog max-width="290" v-model="showRemoveDeviceDialog">
+    <v-dialog max-width="80%" v-model="showDialog" v-show="selectedDevice!==undefined">
       <v-card>
         <v-list dense>
-          <v-list-item>设备名称：</v-list-item>
-          <v-list-item>设备状态：</v-list-item>
-          <v-list-item>UUID：</v-list-item>
-          <v-list-item>操作系统：</v-list-item>
-          <v-list-item>支持WiFi：</v-list-item>
-          <v-list-item>支持WiFi-P2P：</v-list-item>
-          <v-list-item>支持蓝牙：</v-list-item>
-          <v-list-item>支持NFC：</v-list-item>
-          <v-list-item>支持摄像头：</v-list-item>
-          <v-list-item>屏幕分辨率：</v-list-item>
+          <v-list-item>设备名称：{{ selectedDevice!==undefined?selectedDevice.name:'未知错误' }}</v-list-item>
+          <v-list-item>设备状态：{{ selectedDevice!==undefined?getDeviceStatus(selectedDevice.status):'未知错误' }}</v-list-item>
+          <v-list-item>UUID：{{ selectedDevice!==undefined?selectedDevice.uuid:'未知错误' }}</v-list-item>
+          <v-list-item>操作系统：{{ selectedDevice!==undefined?selectedDevice.props.os:'未知错误' }}</v-list-item>
+          <v-list-item>支持网络：{{ selectedDevice!==undefined?selectedDevice.props.network==true?'是':'否':'未知错误' }}</v-list-item>
+          <v-list-item>支持WiFi-P2P：{{ selectedDevice?selectedDevice.props.wifip2p==true?'是':'否':'未知错误' }}</v-list-item>
+          <v-list-item>支持蓝牙：{{ selectedDevice?selectedDevice.props.bluetooth==true?'是':'否':'未知错误' }}</v-list-item>
+          <v-list-item>支持NFC：{{ selectedDevice?selectedDevice.props.nfc==true?'是':'否':'未知错误' }}</v-list-item>
+          <v-list-item>支持摄像头：{{ selectedDevice?selectedDevice.props.camera==true?'是':'否':'未知错误' }}</v-list-item>
+          <v-list-item>屏幕分辨率：{{ selectedDevice?selectedDevice.props.screenResolution:'未知错误' }}</v-list-item>
         </v-list>
         <v-card-actions>
-          <v-btn @click="showRemoveDeviceDialog = false" color="red darken-1" text>删除</v-btn>
+          <v-btn @click="deleteDevice(selectedDevice.uuid);" color="red darken-1" text>删除</v-btn>
           <v-spacer></v-spacer>
-          <v-btn @click="showRemoveDeviceDialog = false" color="green darken-1" text>确定</v-btn>
+          <v-btn @click="showDialog=false;" color="green darken-1" text>确定</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </v-card>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+import DeviceInfo from '@/components/DeviceInfo.vue'
+
+export default Vue.extend({
   name: 'Home',
   components: {
-    // HelloWorld
+    DeviceInfo
   },
   data: function () {
     return {
-      tipTitle: '无配对设备',
-      tipDeviceName: '设备名称',
-      tipDeviceStatus: '设备状态',
-      tipDialogTitle: '取消配对？',
-      showRemoveDeviceDialog: false,
-      dialog: false,
-      items: [
-        {
-          type: 'mdi-laptop',
-          uuid: '123456',
-          name: '设备名称1',
-          status: '已连接',
-          infos: [
-            { prop: '支持蓝牙', value: 'yes' }
-          ]
-        },
-        {
-          type: 'mdi-cellphone',
-          uuid: '13sdfg345',
-          name: '设备名称2',
-          status: '没有状态',
-          infos: [
-            { prop: '支持蓝牙', value: 'yes' }
-          ]
-        },
-        {
-          type: 'mdi-laptop',
-          uuid: '123434556',
-          name: '设备名称3',
-          status: '没有状态',
-          infos: [
-            { prop: '支持蓝牙', value: 'yes' }
-          ]
-        }
-      ],
+      showDialog: false,
+      selectedDevice: undefined,
       funcs: [
         {
           icon: 'mdi-clipboard-flow',
@@ -148,45 +129,37 @@ export default {
     }
   },
   methods: {
-    openRemoveDeviceDialog () {
-      this.showRemoveDeviceDialog = true
+    openDialog (device: undefined) {
+      this.showDialog = true
+      this.selectedDevice = device
     },
-    closeRemoveDeviceDialog () {
-      this.showRemoveDeviceDialog = false
+    closeDialog () {
+      this.selectedDevice = undefined
+      this.showDialog = false
+    },
+    getDeviceTypeIcon (type: string) {
+      switch (type) {
+        case 'pc':
+          return 'mdi-laptop'
+        case 'phone':
+          return 'mdi-cellphone'
+        case 'tv':
+          return 'mdi-television'
+        default:
+          return 'mdi-help'
+      }
+    },
+    getDeviceStatus (status: string) {
+      if (status === 'connected') {
+        return '已连接'
+      } else {
+        return '离线'
+      }
+    },
+    deleteDevice (uuid: string) {
+      this.closeDialog()
+      this.$store.commit('removeDevice', uuid)
     }
   }
-}
+})
 </script>
-
-<style>
-.card {
-  width: 90%;
-  margin: 15px auto;
-  text-align: left;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-  border-radius: 10px;
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
-
-.cardDeviceInfo {
-  height: 64px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.test1 {
-  background: yellow;
-  height: 20px;
-}
-
-.test2 {
-  background: blue;
-}
-</style>

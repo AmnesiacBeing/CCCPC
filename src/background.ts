@@ -14,7 +14,7 @@ let win: BrowserWindow | null
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 480,
@@ -79,6 +79,9 @@ app.on('ready', async () => {
   }
   createWindow()
 })
+
+// 终于找到为啥终端会有错误信息了，原来是开了代理
+app.commandLine.appendSwitch('no-proxy-server')
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

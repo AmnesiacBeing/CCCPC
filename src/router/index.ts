@@ -9,12 +9,17 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/qrcode',
+    name: 'QRCode',
+    component: () => import('../views/QRCode.vue')
+  },
+  {
+    path: '/qrcodescan',
+    name: 'QRCodeScan',
+    component: () => import('../views/QRCodeScan.vue')
   }
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ]
 
 const router = new VueRouter({
