@@ -10,7 +10,7 @@
       <v-btn @click="toggleLock()" icon title="置顶窗口">
         <v-icon>{{lock?'mdi-lock':'mdi-lock-open'}}</v-icon>
       </v-btn>
-      <v-btn @click="refresh()" icon title="自适应窗口">
+      <v-btn @click="reset()" icon title="自适应窗口">
         <v-icon>mdi-refresh</v-icon>
       </v-btn>
       <v-btn @click="close();" icon title="关闭窗口">
@@ -57,8 +57,8 @@ export default Vue.extend({
       remote.getCurrentWindow().setAlwaysOnTop(this.lock)
     },
     // 重新设定窗口大小
-    refresh () {
-      remote.getCurrentWindow().setContentSize(480, 600)
+    reset () {
+      remote.getCurrentWindow().setContentSize(480, 800)
     },
     // 关闭窗口
     close () {
