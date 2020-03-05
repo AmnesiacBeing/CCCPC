@@ -8,19 +8,17 @@
       <v-toolbar-title v-text="tipTitle()"></v-toolbar-title>
       <v-spacer />
       <v-btn @click="toggleLock()" icon title="置顶窗口">
-        <v-icon>{{lock?'mdi-lock':'mdi-lock-open'}}</v-icon>
+        <v-icon>{{ lock ? "mdi-lock" : "mdi-lock-open" }}</v-icon>
       </v-btn>
       <v-btn @click="reset()" icon title="自适应窗口">
         <v-icon>mdi-refresh</v-icon>
       </v-btn>
-      <v-btn @click="close();" icon title="关闭窗口">
+      <v-btn @click="close()" icon title="关闭窗口">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-app-bar>
     <v-content>
-      <keep-alive>
-        <router-view />
-      </keep-alive>
+      <router-view />
     </v-content>
   </v-app>
 </template>

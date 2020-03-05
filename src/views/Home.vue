@@ -2,7 +2,7 @@
   <v-card style="margin:10px 20px;">
     <v-list subheader two-line>
       <v-subheader>
-        {{ this.$store.state.devices.length==0?'无':'' }}配对设备
+        {{ this.$store.state.devices.length == 0 ? "无" : "" }}配对设备
         <v-spacer />
         <v-menu>
           <template v-slot:activator="{ on: menu }">
@@ -12,13 +12,13 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item @click="$router.push('qrcode');">
+            <v-list-item @click="$router.push('qrcode')">
               <v-list-item-icon>
                 <v-icon>mdi-qrcode</v-icon>
               </v-list-item-icon>
               <v-list-item-title>显示二维码</v-list-item-title>
             </v-list-item>
-            <v-list-item @click=";">
+            <v-list-item @click="$router.push('qrcodescan')">
               <v-list-item-icon>
                 <v-icon>mdi-qrcode-scan</v-icon>
               </v-list-item-icon>
@@ -31,19 +31,19 @@
         :device="this.$store.state.devices[0]"
         @click=";"
         @info="openDialog($event)"
-        v-if="this.$store.state.devices.length>=1"
+        v-if="this.$store.state.devices.length >= 1"
       />
-      <v-list-group v-if="this.$store.state.devices.length>1">
+      <v-list-group v-if="this.$store.state.devices.length > 1">
         <template v-slot:activator>
           <v-list-item-subtitle>查看更多</v-list-item-subtitle>
         </template>
-        <template v-for="(item,index) in this.$store.state.devices">
+        <template v-for="(item, index) in this.$store.state.devices">
           <device-info
             :device="item"
             :key="item.uuid"
             @click=";"
             @info="openDialog($event)"
-            v-if="index!=0"
+            v-if="index != 0"
           />
         </template>
       </v-list-group>
@@ -75,24 +75,24 @@
       </template>
     </v-list>
 
-    <v-dialog max-width="80%" v-model="showDialog" v-show="selectedDevice!==undefined">
+    <v-dialog
+      max-width="80%"
+      v-model="showDialog"
+      v-show="selectedDevice !== undefined"
+    >
       <v-card>
-        <v-list dense>
-          <v-list-item>设备名称：{{ selectedDevice!==undefined?selectedDevice.name:'未知错误' }}</v-list-item>
-          <v-list-item>设备状态：{{ selectedDevice!==undefined?getDeviceStatus(selectedDevice.status):'未知错误' }}</v-list-item>
-          <v-list-item>UUID：{{ selectedDevice!==undefined?selectedDevice.uuid:'未知错误' }}</v-list-item>
-          <v-list-item>操作系统：{{ selectedDevice!==undefined?selectedDevice.props.os:'未知错误' }}</v-list-item>
-          <v-list-item>支持网络：{{ selectedDevice!==undefined?selectedDevice.props.network==true?'是':'否':'未知错误' }}</v-list-item>
-          <v-list-item>支持WiFi-P2P：{{ selectedDevice?selectedDevice.props.wifip2p==true?'是':'否':'未知错误' }}</v-list-item>
-          <v-list-item>支持蓝牙：{{ selectedDevice?selectedDevice.props.bluetooth==true?'是':'否':'未知错误' }}</v-list-item>
-          <v-list-item>支持NFC：{{ selectedDevice?selectedDevice.props.nfc==true?'是':'否':'未知错误' }}</v-list-item>
-          <v-list-item>支持摄像头：{{ selectedDevice?selectedDevice.props.camera==true?'是':'否':'未知错误' }}</v-list-item>
-          <v-list-item>屏幕分辨率：{{ selectedDevice?selectedDevice.props.screenResolution:'未知错误' }}</v-list-item>
-        </v-list>
+        <device-info-detail :device="selectedDevice" />
         <v-card-actions>
-          <v-btn @click="deleteDevice(selectedDevice.uuid);" color="red darken-1" text>删除</v-btn>
+          <v-btn
+            @click="deleteDevice(selectedDevice.uuid)"
+            color="red darken-1"
+            text
+            >删除</v-btn
+          >
           <v-spacer></v-spacer>
-          <v-btn @click="showDialog=false;" color="green darken-1" text>确定</v-btn>
+          <v-btn @click="showDialog = false" color="green darken-1" text
+            >确定</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -102,32 +102,32 @@
 <script lang="ts">
 import Vue from 'vue'
 import DeviceInfo from '@/components/DeviceInfo.vue'
+import DeviceInfoDetail from '@/components/DeviceInfoDetail.vue'
 
 export default Vue.extend({
   name: 'Home',
   components: {
-    DeviceInfo
+    DeviceInfo,
+    DeviceInfoDetail
   },
-  data: function () {
-    return {
-      showDialog: false,
-      selectedDevice: undefined,
-      funcs: [
-        {
-          icon: 'mdi-clipboard-flow',
-          name: '分享剪贴板'
-        },
-        {
-          icon: 'mdi-share',
-          name: '分享文件'
-        },
-        {
-          icon: 'mdi-cast',
-          name: '分享屏幕'
-        }
-      ]
-    }
-  },
+  data: () => ({
+    showDialog: false,
+    selectedDevice: undefined,
+    funcs: [
+      {
+        icon: 'mdi-clipboard-flow',
+        name: '分享剪贴板'
+      },
+      {
+        icon: 'mdi-share',
+        name: '分享文件'
+      },
+      {
+        icon: 'mdi-cast',
+        name: '分享屏幕'
+      }
+    ]
+  }),
   methods: {
     openDialog (device: undefined) {
       this.showDialog = true

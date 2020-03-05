@@ -1,23 +1,24 @@
 <template>
   <v-card class="center">
-    <v-card-title>这里应该有一些提示信息……</v-card-title>
+    <v-card-title>该设备二维码与信息：</v-card-title>
     <qrcode-vue :size="size" :value="value" level="H"></qrcode-vue>
+    <device-info-detail />
   </v-card>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import QrcodeVue from 'qrcode.vue'
+import DeviceInfoDetail from '@/components/DeviceInfoDetail.vue'
 
 export default Vue.extend({
-  data () {
-    return {
-      value: 'https://example.com',
-      size: 300
-    }
-  },
+  data: () => ({
+    value: 'https://example.com',
+    size: 240
+  }),
   components: {
-    QrcodeVue
+    QrcodeVue,
+    DeviceInfoDetail
   }
 })
 </script>
